@@ -6,7 +6,7 @@ export interface Location {
   mask: string;
   towel: string;
   fountain: string;
-  locker_room: string;
+  lockerRoom: string;
   schedules: Schedule[];
 }
 
