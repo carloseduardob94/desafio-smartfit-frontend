@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http'
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { UnitsResponse } from '../types/units-response.interface';
+import { Location } from 'src/app/types/location.interface'
+
 
 @Injectable({
   providedIn: 'root'
@@ -10,9 +12,27 @@ import { UnitsResponse } from '../types/units-response.interface';
 export class GetUnitsService {
   readonly apiUrl = "https://test-frontend-developer.s3.amazonaws.com/data/locations.json"
 
-  constructor(private httpClient: HttpClient) { }
+  private allUnitsSubject: BehaviorSubject<Location[]> = new BehaviorSubject<Location[]>([])
 
-  getAllUnits(): Observable<UnitsResponse> {
-    return this.httpClient.get<UnitsResponse>(this.apiUrl)
+  private allUnits$: Observable<Location[]> = this.allUnitsSubject.asObservable()
+  private filteredUnits: Location[]= []
+
+  constructor(private httpClient: HttpClient) {
+    this.httpClient.get<UnitsResponse>(this.apiUrl).subscribe(data => {
+      this.allUnitsSubject.next(data.locations)
+      this.filteredUnits = data.locations
+    })
+  }
+
+  getAllUnits(): Observable<Location[]> {
+    return this.allUnits$
+  }
+
+  getFilteredUnits() {
+    return this.filteredUnits
+  }
+
+  setFilteredUnits(value: Location[]) {
+    this.filteredUnits = value
   }
 }
